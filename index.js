@@ -5,7 +5,10 @@ const connection = require('./database.js')
 const cors = require('cors');
 require('dotenv').config();
 app.use(express.json())
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: 'http://ec2-54-86-133-146.compute-1.amazonaws.com'
+}));
 
 const hostname=process.env.HOSTNAME;
 const port=process.env.PORT;
