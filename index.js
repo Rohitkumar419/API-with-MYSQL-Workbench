@@ -1,14 +1,16 @@
 const express = require('express')
 const app = express()
+const http = require('http')
 const connection = require('./database.js')
-
+require('dotenv').config();
 app.use(express.json())
 
-
+const hostname=process.env.HOSTNAME;
+const port=process.env.PORT;
 
 //GET API FOR TOWER SUMMARY
 app.get('/getControlTowerSummary',(req,res)=>{
-    connection.query("select * from tower_summary",(err,result)=>{
+    connection.query("select id,value,status,colour from tower_summary",(err,result)=>{
         if(err)
         {
             res.send('Error');
@@ -23,7 +25,7 @@ app.get('/getControlTowerSummary',(req,res)=>{
 
 
 //POST API FOR TOWER SUMMARY
-app.post('/getControlTowerSummary' , (req,res) => {
+app.post('/createControlTowerRecord' , (req,res) => {
     const id = req.body.id ;
     const value = req.body.value ;
     const status = req.body.status ;
@@ -43,7 +45,7 @@ app.post('/getControlTowerSummary' , (req,res) => {
 
 //PUT API FOR TOWER SUMMARY
 
-app.put('/getControlTowerSummary/:id', (req,res) => {
+app.put('/updateControlTowerRecord/:id', (req,res) => {
     const data = [req.body.status,req.body.colour,req.params.id]
     connection.query("UPDATE tower_summary SET status = ?, colour = ? WHERE id = ?" , data, (err,result) => {
         if(err)
@@ -60,7 +62,7 @@ app.put('/getControlTowerSummary/:id', (req,res) => {
 
 //DELETE API FOR TOWER SUMMARY
 
-app.delete('/getControlTowerSummary/:id' , (req,res) => {
+app.delete('/deleteControlTowerRecord/:id' , (req,res) => {
     const data = req.params.id;
     connection.query('DELETE FROM tower_summary WHERE id = ?', data, (err,result)=>{
         if(err)
@@ -92,7 +94,7 @@ app.get('/getActivityInsights',(req,res)=>{
 
 
 //POST API FOR ACTIVITY INSIGHTS
-app.post('/getActivityInsights' , (req,res) => {
+app.post('/createActivityInsights' , (req,res) => {
     const id = req.body.id ;
     const value = req.body.value ;
     const alarms = req.body.alarms ;
@@ -113,7 +115,7 @@ app.post('/getActivityInsights' , (req,res) => {
 
 //PUT API FOR ACTIVITY INSIGHTS
 
-app.put('/getActivityInsights/:id', (req,res) => {
+app.put('/updateActivityInsights/:id', (req,res) => {
     const data = [req.body.status,req.body.colour,req.params.id]
     connection.query("UPDATE activity_insights SET alarms = ?, warnings = ? WHERE id = ?" , data, (err,result) => {
         if(err)
@@ -131,7 +133,7 @@ app.put('/getActivityInsights/:id', (req,res) => {
 
 //DELETE API FOR ACTIVITY INSIGHTS
 
-app.delete('/getActivityInsights' , (req,res) => {
+app.delete('/deleteActivityInsights' , (req,res) => {
     const data = req.body.id;
     connection.query('DELETE FROM activity_insights WHERE id = ?', data, (err,result)=>{
         if(err)
@@ -146,13 +148,125 @@ app.delete('/getActivityInsights' , (req,res) => {
 
 
 
+//GET API FOR 2ND COLOUMN
+
+app.get('/getOpenActivity' , ()=>{
+
+})
 
 
-app.listen(4200,(err,res)=>{
+
+//Get API for 3rd column
+
+// app.get('/getAllInsights' , (req,res) => {
+//     console.log(`inside get all insights`)
+//     const blendInsights=connection.query("SELECT id,blend_colour FROM control_tower.tower_summary",(err,result)=>{
+//         if(err)
+//         {console.log(`inside error`)
+//             return err;
+//         }else{
+//             console.log("able to fetch open Activity")
+//             console.log(`result`);
+//            return result;
+//         }
+//     })
+    
+//     var PList = {
+//     Blend_Insights :    
+//     [{
+//         blendInsights
+//     }]
+    
+
+	
+    //     Production_Insights:
+    //     [{
+    //         connection.query("SELECT SUM(total_downtime) FROM control_tower.production_insights;",(err,result)=>{
+    //             if(err)
+    //                 {
+    //                     res.send('Error');
+    //                 }else{
+    //                     console.log("able to fetch all Insights")
+    //                     res.send("Total DownTime:" , result);
+    //                 }
+    //             })
+	// 	},
+		
+        
+    //     {
+    //         connection.query("",(err,result)=>{
+    //             if(err)
+    //                 {
+    //                     res.send('Error');
+    //                 }else{
+    //                     console.log("able to fetch all Insights")
+    //                     res.send("Plant OEE:" , result);
+    //                 }
+    //             })
+	// 	},
+		
+        
+    //     {
+    //         connection.query("select total_downtime FROM control_tower.production_insights ORDER BY total_downtime DESC limit 3;",(err,result)=>{
+    //             if(err)
+    //                 {
+    //                     res.send('Error');
+    //                 }else{
+    //                     console.log("able to fetch all Insights")
+    //                     res.send("Lines with Highest Downtime:" , result);
+    //                 }
+    //             })
+	// 	}],
+
+
+    // Activity_Insights :
+
+    // [{
+    // connection.query("SELECT alarm_type,COUNT(*) FROM control_tower.activity_insights GROUP BY alarm_type;",(err,result)=>{
+    //     if(err)
+    //         {
+    //             res.send('Error');
+    //         }else{
+    //             console.log("able to fetch all Insights")
+    //             res.send("Activity Insights:" , result);
+    //         }
+    //     })
+    // }]
+//     }
+//     res.send(PList);
+// })
+
+
+
+
+
+//server
+app.listen(port,hostname,(err,res)=>{
     if(err)
     {
         console.log("ERROR in starting server!")
     } else {
-    console.log(`Backend server is running!`)}
+    console.log(`Backend server is running on port 4200!`)}
 })
+
+
+
+
+
+
+
+
+
+// const hostname = '127.0.0.1';
+// const port = 4200;
+
+// const server = http.createServer((req, res) => {
+//   res.statusCode = 200;
+//   res.setHeader('Content-Type', 'text/plain');
+//   res.end('Hello World');
+// });
+
+// server.listen(port, hostname, () => {
+//   console.log(`Server running at http://${hostname}:${port}/`);
+// });
 
