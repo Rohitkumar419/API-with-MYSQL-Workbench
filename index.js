@@ -150,33 +150,47 @@ app.delete('/deleteActivityInsights' , (req,res) => {
 
 //GET API FOR 2ND COLOUMN
 
-app.get('/getOpenActivity' , ()=>{
-
+app.get('/getOpenActivity',(req,res)=>{
+    connection.query("select * from control_tower.open_Activity;",(err,result)=>{
+        if(err)
+        {
+            res.send('Error');
+        }else{
+            console.log("able to fetch the data")
+            res.send(result);
+        }
+    });
+   
 })
 
 
 
-//Get API for 3rd column
 
-// app.get('/getAllInsights' , (req,res) => {
+
+
+//GET API FOR 3RD COLUMN (under construction)
+
+// app.get('/getAllInsights' , async (req,res) => {
 //     console.log(`inside get all insights`)
-//     const blendInsights=connection.query("SELECT id,blend_colour FROM control_tower.tower_summary",(err,result)=>{
-//         if(err)
-//         {console.log(`inside error`)
-//             return err;
-//         }else{
-//             console.log("able to fetch open Activity")
-//             console.log(`result`);
-//            return result;
-//         }
-//     })
+//     const blendInsights= await connection.query("SELECT id,blend_colour FROM control_tower.tower_summary")
+    // ,(err,result)=>{
+    //     if(err)
+    //     {console.log(`inside error`)
+    //         return err;
+    //     }else{
+    //         console.log("able to fetch open Activity")
+    //         console.log(`result`);
+    //        return result;
+    //     }
+     
+    
     
 //     var PList = {
 //     Blend_Insights :    
 //     [{
 //         blendInsights
 //     }]
-    
+// })
 
 	
     //     Production_Insights:
@@ -234,7 +248,7 @@ app.get('/getOpenActivity' , ()=>{
     // }]
 //     }
 //     res.send(PList);
-// })
+
 
 
 
@@ -248,25 +262,3 @@ app.listen(port,hostname,(err,res)=>{
     } else {
     console.log(`Backend server is running on port 4200!`)}
 })
-
-
-
-
-
-
-
-
-
-// const hostname = '127.0.0.1';
-// const port = 4200;
-
-// const server = http.createServer((req, res) => {
-//   res.statusCode = 200;
-//   res.setHeader('Content-Type', 'text/plain');
-//   res.end('Hello World');
-// });
-
-// server.listen(port, hostname, () => {
-//   console.log(`Server running at http://${hostname}:${port}/`);
-// });
-
