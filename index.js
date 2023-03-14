@@ -168,87 +168,65 @@ app.get('/getOpenActivity',(req,res)=>{
 
 
 
-//GET API FOR 3RD COLUMN (under construction)
+//GET API FOR 3RD COLUMN ()
 
-// app.get('/getAllInsights' , async (req,res) => {
-//     console.log(`inside get all insights`)
-//     const blendInsights= await connection.query("SELECT id,blend_colour FROM control_tower.tower_summary")
-    // ,(err,result)=>{
-    //     if(err)
-    //     {console.log(`inside error`)
-    //         return err;
-    //     }else{
-    //         console.log("able to fetch open Activity")
-    //         console.log(`result`);
-    //        return result;
-    //     }
-     
-    
-    
-//     var PList = {
-//     Blend_Insights :    
-//     [{
-//         blendInsights
-//     }]
-// })
+var mysql      = require('mysql');
+var async      = require('async');
+// var credentials = {}
 
-	
-    //     Production_Insights:
-    //     [{
-    //         connection.query("SELECT SUM(total_downtime) FROM control_tower.production_insights;",(err,result)=>{
-    //             if(err)
-    //                 {
-    //                     res.send('Error');
-    //                 }else{
-    //                     console.log("able to fetch all Insights")
-    //                     res.send("Total DownTime:" , result);
-    //                 }
-    //             })
-	// 	},
-		
-        
-    //     {
-    //         connection.query("",(err,result)=>{
-    //             if(err)
-    //                 {
-    //                     res.send('Error');
-    //                 }else{
-    //                     console.log("able to fetch all Insights")
-    //                     res.send("Plant OEE:" , result);
-    //                 }
-    //             })
-	// 	},
-		
-        
-    //     {
-    //         connection.query("select total_downtime FROM control_tower.production_insights ORDER BY total_downtime DESC limit 3;",(err,result)=>{
-    //             if(err)
-    //                 {
-    //                     res.send('Error');
-    //                 }else{
-    //                     console.log("able to fetch all Insights")
-    //                     res.send("Lines with Highest Downtime:" , result);
-    //                 }
-    //             })
-	// 	}],
+app.get('/getAllInsights', function (req, res) {
+    // var connection = mysql.createConnection(credentials);
+    var query1 = "SELECT id,blend_colour FROM control_tower.tower_summary;";
+    var query2 = "SELECT SUM(total_downtime) FROM control_tower.production_insights;";
+    var query3 = "SELECT (SUM(downtime)/SUM(total_downtime))*100 FROM control_tower.production_insights;";
+    var query4 = "select total_downtime FROM control_tower.production_insights ORDER BY total_downtime DESC limit 3;";
+    var query5 = "SELECT alarm_type,COUNT(*) FROM control_tower.activity_insights GROUP BY alarm_type;";
 
+    var return_data = {};
 
-    // Activity_Insights :
-
-    // [{
-    // connection.query("SELECT alarm_type,COUNT(*) FROM control_tower.activity_insights GROUP BY alarm_type;",(err,result)=>{
-    //     if(err)
-    //         {
-    //             res.send('Error');
-    //         }else{
-    //             console.log("able to fetch all Insights")
-    //             res.send("Activity Insights:" , result);
-    //         }
-    //     })
-    // }]
-//     }
-//     res.send(PList);
-
+    async.parallel([
+       function(parallel_done) {
+           connection.query(query1, {}, function(err, results) {
+               if (err) return parallel_done(err);
+               return_data.BLEND_INSIGHTS = results;
+               parallel_done();
+           });
+       },
+       function(parallel_done) {
+           connection.query(query2, {}, function(err, results) {
+               if (err) return parallel_done(err);
+               return_data.Total_Downtime= results;
+               parallel_done();
+           });
+       },
+       function(parallel_done) {
+        connection.query(query3, {}, function(err, results) {
+            if (err) return parallel_done(err);
+            return_data.Plant_OEE = results;
+            parallel_done();
+        });
+    },
+    function(parallel_done) {
+        connection.query(query4, {}, function(err, results) {
+            if (err) return parallel_done(err);
+            return_data.Lines_with_highest_downtime = results;
+            parallel_done();
+        });
+    },
+    function(parallel_done) {
+        connection.query(query5, {}, function(err, results) {
+            if (err) return parallel_done(err);
+            return_data.ACTIVITY_INSIGHTS = results;
+            parallel_done();
+        });
+    }  
+    ],
+    function(err) {
+         if (err) console.log(err);
+         connection.end();
+         res.send(return_data);
+    });
+});
 
 
 
@@ -256,9 +234,10 @@ app.get('/getOpenActivity',(req,res)=>{
 
 //server
 app.listen(port,hostname,(err,res)=>{
-    if(err)
-    {
-        console.log("ERROR in starting server!")
-    } else {
-    console.log(`Backend server is running on port 4200!`)}
+    if(err) {
+        res.send("Error in starting server")
+    } else{
+        console.log("Server is up on port 4200")
+    }
 })
+
