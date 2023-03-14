@@ -2,8 +2,10 @@ const express = require('express')
 const app = express()
 const http = require('http')
 const connection = require('./database.js')
+const cors = require('cors');
 require('dotenv').config();
 app.use(express.json())
+app.use(cors());
 
 const hostname=process.env.HOSTNAME;
 const port=process.env.PORT;
@@ -209,6 +211,7 @@ app.get('/getAllInsights', function (req, res) {
     function(parallel_done) {
         connection.query(query4, {}, function(err, results) {
             if (err) return parallel_done(err);
+            // console.log(`result for lines with highest downtime is ${JSON.stringify(results)}`)
             return_data.Lines_with_highest_downtime = results;
             parallel_done();
         });
