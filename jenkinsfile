@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+     environment {
+        HEARTBEAT_CHECK_INTERVAL = "86400"
+    }
+    
+    tools {nodejs "NodeJS"}
+    
+    stages {
+        stage('Build') {
+            steps {
+               git branch: 'main', url: 'https://github.com/Rohitkumar419/API-with-MYSQL-Workbench.git'
+                sh 'npm install'
+                sh 'npm install express'
+                sh 'npm install mysql'
+                sh 'npm install dotenv'
+                sh 'npm install -g'
+                sh 'npm install cors'
+                // sh 'npm install -g pm2'
+                // sh 'pm2 node index'
+                sh 'node index'
+                // sh 'npm start'
+                // sh 'npm run build'
+            }
+        }
+    }
+}
+
+//pipeline script for jenkins job 
